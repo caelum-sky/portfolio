@@ -1,3 +1,4 @@
+# .github/workflows/render-deploy.yml
 name: Deploy Backend → Render
 
 on:
@@ -6,6 +7,13 @@ on:
     paths:
       - "backend/**"
       - ".github/workflows/render-deploy.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   trigger-render-deploy:
@@ -16,10 +24,17 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
-            curl -s -X POST "$RENDER_DEPLOY_HOOK_URL" \
-              -H "Content-Type: application/json"
-            echo "Render deploy triggered."
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not configured."
+            exit 1
+          fi
+
+          http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK_URL" \
+            -H "Content-Type: application/json")
+
+          if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
+            echo "Render deploy triggered (HTTP $http_status)."
           else
-            echo "RENDER_DEPLOY_HOOK_URL is not configured; skipping deploy."
+            echo "::error::Render deploy hook failed with HTTP $http_status"
+            exit 1
           fi

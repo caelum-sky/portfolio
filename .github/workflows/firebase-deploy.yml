@@ -1,3 +1,4 @@
+# .github/workflows/firebase-deploy.yml
 name: Deploy Frontend → Firebase Hosting
 
 on:
@@ -8,6 +9,13 @@ on:
       - "firebase.json"
       - ".firebaserc"
       - ".github/workflows/firebase-deploy.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
@@ -21,10 +29,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
 
       - name: Build
         working-directory: frontend
