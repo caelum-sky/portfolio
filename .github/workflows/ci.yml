@@ -25,7 +25,7 @@ jobs:
       - name: Build
         working-directory: frontend
         env:
-          VITE_BACKEND_URL: https://placeholder.onrender.com
+          VITE_BACKEND_URL: https://portfolio-ecpa.onrender.com
         run: npm run build
 
   backend-check:
