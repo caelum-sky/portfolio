@@ -3,6 +3,15 @@ export default {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    screens: {
+      // xs: custom breakpoint for very small phones (≥380px)
+      xs: "380px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       fontFamily: {
         display: ["Chivo", "sans-serif"],
@@ -42,5 +51,17 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // touch-action-manipulation utility
+    function({ addUtilities }) {
+      addUtilities({
+        ".touch-action-manipulation": {
+          "touch-action": "manipulation",
+        },
+        ".overscroll-contain": {
+          "overscroll-behavior": "contain",
+        },
+      });
+    },
+  ],
 };

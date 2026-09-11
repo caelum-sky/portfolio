@@ -4,207 +4,399 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── CSS Custom Properties ──────────────────────────────────────────────── */
 @layer base {
-    :root {
-        --background: 222 47% 4%;
-        --foreground: 210 40% 96%;
-        --card: 222 40% 7%;
-        --card-foreground: 210 40% 96%;
-        --popover: 222 40% 7%;
-        --popover-foreground: 210 40% 96%;
-        --primary: 187 100% 50%;
-        --primary-foreground: 222 47% 4%;
-        --secondary: 222 30% 12%;
-        --secondary-foreground: 210 40% 96%;
-        --muted: 222 30% 12%;
-        --muted-foreground: 215 20% 65%;
-        --accent: 187 100% 50%;
-        --accent-foreground: 222 47% 4%;
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 187 80% 50% / 0.15;
-        --input: 222 30% 16%;
-        --ring: 187 100% 50%;
-        --radius: 0.5rem;
-    }
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 96%;
+    --card: 222 40% 7%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 40% 7%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 187 100% 50%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 222 30% 12%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 222 30% 12%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 187 100% 50%;
+    --accent-foreground: 222 47% 4%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 187 80% 50% / 0.15;
+    --input: 222 30% 16%;
+    --ring: 187 100% 50%;
+    --radius: 0.5rem;
+
+    /* glow colours */
+    --glow-cyan: rgba(0, 240, 255, 0.55);
+    --glow-blue: rgba(0, 114, 255, 0.3);
+    --glow-purple: rgba(168, 85, 247, 0.45);
+    --glow-gold: rgba(255, 215, 0, 0.5);
+  }
 }
 
+/* ─── Base Reset ─────────────────────────────────────────────────────────── */
 @layer base {
-    * {
-        @apply border-border;
-    }
-    html {
-        scroll-behavior: auto;
-    }
-    body {
-        background-color: #030509;
-        color: #f1f5f9;
-        font-family: 'IBM Plex Sans', system-ui, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        overflow-x: hidden;
-    }
-    ::selection {
-        background: rgba(0, 240, 255, 0.35);
-        color: #ffffff;
-    }
-    ::-webkit-scrollbar {
-        width: 9px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #030509;
-    }
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto;
+    /* Prevent layout shift from scrollbar */
+    overflow-y: scroll;
+    /* Better text rendering on mobile */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: #030509;
+    color: #f1f5f9;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    /* Prevent rubber-band bounce causing layout issues on iOS */
+    overscroll-behavior-x: none;
+  }
+
+  ::selection {
+    background: rgba(0, 240, 255, 0.35);
+    color: #ffffff;
+  }
+
+  /* Desktop scrollbar */
+  @media (min-width: 768px) {
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #030509; }
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #00f0ff 0%, #0072ff 100%);
-        border-radius: 99px;
-        border: 2px solid #030509;
+      background: linear-gradient(180deg, #00f0ff 0%, #0072ff 100%);
+      border-radius: 99px;
+      border: 2px solid #030509;
     }
+  }
+
+  /* Mobile: hide scrollbar but keep scroll functionality */
+  @media (max-width: 767px) {
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    * { scrollbar-width: none; }
+  }
 }
 
+/* ─── Cursor: disable on touch devices ──────────────────────────────────── */
 @media (pointer: fine) {
-    body, body * {
-        cursor: none !important;
-    }
+  body, body * { cursor: none !important; }
 }
 
+/* ─── Debug wrapper passthrough ──────────────────────────────────────────── */
 @layer base {
-    [data-debug-wrapper="true"] {
-        display: contents !important;
-    }
-    [data-debug-wrapper="true"] > * {
-        margin-left: inherit; margin-right: inherit; margin-top: inherit; margin-bottom: inherit;
-        padding-left: inherit; padding-right: inherit; padding-top: inherit; padding-bottom: inherit;
-        column-gap: inherit; row-gap: inherit; gap: inherit;
-        border-left-width: inherit; border-right-width: inherit; border-top-width: inherit; border-bottom-width: inherit;
-        border-left-style: inherit; border-right-style: inherit; border-top-style: inherit; border-bottom-style: inherit;
-        border-left-color: inherit; border-right-color: inherit; border-top-color: inherit; border-bottom-color: inherit;
-    }
+  [data-debug-wrapper="true"] { display: contents !important; }
+  [data-debug-wrapper="true"] > * {
+    margin-left: inherit; margin-right: inherit;
+    margin-top: inherit; margin-bottom: inherit;
+    padding-left: inherit; padding-right: inherit;
+    padding-top: inherit; padding-bottom: inherit;
+    column-gap: inherit; row-gap: inherit; gap: inherit;
+    border-left-width: inherit; border-right-width: inherit;
+    border-top-width: inherit; border-bottom-width: inherit;
+    border-left-style: inherit; border-right-style: inherit;
+    border-top-style: inherit; border-bottom-style: inherit;
+    border-left-color: inherit; border-right-color: inherit;
+    border-top-color: inherit; border-bottom-color: inherit;
+  }
 }
 
+/* ─── Utility Classes ────────────────────────────────────────────────────── */
 @layer utilities {
-    .font-display { font-family: 'Chivo', sans-serif; }
-    .font-mono2 { font-family: 'JetBrains Mono', monospace; }
-    .text-glow { text-shadow: 0 0 18px rgba(0, 240, 255, 0.55), 0 0 60px rgba(0, 114, 255, 0.3); }
-    .text-glow-gold { text-shadow: 0 0 18px rgba(255, 215, 0, 0.5); }
-    .outline-text {
-        color: transparent;
-        -webkit-text-stroke: 1px rgba(0, 240, 255, 0.28);
-    }
-    .glass {
-        background: rgba(10, 14, 23, 0.6);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-    }
+  .font-display  { font-family: 'Chivo', sans-serif; }
+  .font-mono2    { font-family: 'JetBrains Mono', monospace; }
+
+  /* Text glow */
+  .text-glow {
+    text-shadow:
+      0 0 18px var(--glow-cyan),
+      0 0 60px var(--glow-blue);
+  }
+  .text-glow-gold {
+    text-shadow: 0 0 18px var(--glow-gold);
+  }
+  .text-glow-purple {
+    text-shadow: 0 0 18px var(--glow-purple);
+  }
+
+  /* Outline text */
+  .outline-text {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(0, 240, 255, 0.22);
+  }
+
+  /* Glass morphism */
+  .glass {
+    background: rgba(10, 14, 23, 0.65);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+
+  /* Glow box shadows */
+  .glow-cyan  { box-shadow: 0 0 30px rgba(0, 240, 255, 0.3); }
+  .glow-blue  { box-shadow: 0 0 30px rgba(0, 114, 255, 0.3); }
+  .glow-gold  { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+
+  /* Touch targets — good for all interactive elements on mobile */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on interactive elements */
+  .no-select { user-select: none; -webkit-user-select: none; }
 }
 
+/* ─── Film grain overlay ──────────────────────────────────────────────────── */
 .grain {
-    position: fixed;
-    inset: 0;
-    z-index: 70;
-    pointer-events: none;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* ─── Marquee ──────────────────────────────────────────────────────────────── */
 @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 .marquee-track {
-    animation: marquee 48s linear infinite;
+  animation: marquee 48s linear infinite;
+  will-change: transform;
 }
-.marquee-track:hover {
-    animation-play-state: paused;
-}
+.marquee-track:hover { animation-play-state: paused; }
 
+/* ─── Terminal cursor blink ───────────────────────────────────────────────── */
 @keyframes blink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 .t-cursor { animation: blink 1s step-end infinite; }
 
+/* ─── Circuit board traces ────────────────────────────────────────────────── */
 @keyframes circuit-flow {
-    to { stroke-dashoffset: -240; }
+  to { stroke-dashoffset: -240; }
 }
 .trace {
-    fill: none;
-    stroke: rgba(0, 240, 255, 0.35);
-    stroke-width: 1.4;
+  fill: none;
+  stroke: rgba(0, 240, 255, 0.35);
+  stroke-width: 1.4;
 }
 .trace.alt {
-    stroke: rgba(168, 85, 247, 0.3);
+  stroke: rgba(168, 85, 247, 0.3);
 }
 .trace.flow {
-    stroke-dasharray: 8 12;
-    animation: circuit-flow 6s linear infinite;
+  stroke-dasharray: 8 12;
+  animation: circuit-flow 6s linear infinite;
 }
 .node {
-    fill: #00f0ff;
-    filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.9));
+  fill: #00f0ff;
+  filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.9));
 }
 .node.alt {
-    fill: #a855f7;
-    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9));
+  fill: #a855f7;
+  filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.9));
 }
 
+/* ─── Floating orbs (Hero 3D card) ────────────────────────────────────────── */
 @keyframes float-orb {
-    0%, 100% { transform: translateY(0) translateX(0); }
-    50% { transform: translateY(-22px) translateX(10px); }
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50%       { transform: translateY(-22px) translateX(10px); }
 }
 .planet-orb {
-    position: absolute;
-    border-radius: 9999px;
-    pointer-events: none;
-    animation: float-orb 7s ease-in-out infinite;
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  animation: float-orb 7s ease-in-out infinite;
 }
 .orb-1 {
-    width: 54px; height: 54px; top: 4%; right: 12%;
-    background: radial-gradient(circle at 32% 30%, #67e8f9, #0072ff 62%, #02101f);
-    box-shadow: 0 0 34px rgba(0, 240, 255, 0.45);
+  width: 54px; height: 54px; top: 4%; right: 12%;
+  background: radial-gradient(circle at 32% 30%, #67e8f9, #0072ff 62%, #02101f);
+  box-shadow: 0 0 34px rgba(0, 240, 255, 0.45);
 }
 .orb-2 {
-    width: 26px; height: 26px; bottom: 16%; left: 2%;
-    background: radial-gradient(circle at 32% 30%, #e9d5ff, #a855f7 62%, #12041f);
-    box-shadow: 0 0 26px rgba(168, 85, 247, 0.5);
-    animation-delay: 1.6s;
+  width: 26px; height: 26px; bottom: 16%; left: 2%;
+  background: radial-gradient(circle at 32% 30%, #e9d5ff, #a855f7 62%, #12041f);
+  box-shadow: 0 0 26px rgba(168, 85, 247, 0.5);
+  animation-delay: 1.6s;
 }
 .orb-3 {
-    width: 15px; height: 15px; top: 38%; right: 2%;
-    background: radial-gradient(circle at 32% 30%, #fef9c3, #eab308 62%, #1f1502);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    animation-delay: 3.1s;
+  width: 15px; height: 15px; top: 38%; right: 2%;
+  background: radial-gradient(circle at 32% 30%, #fef9c3, #eab308 62%, #1f1502);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  animation-delay: 3.1s;
 }
 
+/* ─── Status indicator dot ────────────────────────────────────────────────── */
 @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
-    50% { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+  50%       { box-shadow: 0 0 0 7px rgba(52, 211, 153, 0); }
 }
 .status-dot {
-    width: 8px; height: 8px; border-radius: 99px;
-    background: #34d399;
-    animation: pulse-dot 2s ease-in-out infinite;
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: #34d399;
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
+/* ─── Glitch effect (WelcomeGate headline) ────────────────────────────────── */
 @keyframes glitch-a {
-    0%, 100% { clip-path: inset(0 0 92% 0); transform: translate(-2px, -1px); }
-    25% { clip-path: inset(28% 0 58% 0); transform: translate(2px, 1px); }
-    50% { clip-path: inset(62% 0 22% 0); transform: translate(-1px, 2px); }
-    75% { clip-path: inset(8% 0 76% 0); transform: translate(1px, -2px); }
+  0%, 100% { clip-path: inset(0 0 92% 0);  transform: translate(-2px, -1px); }
+  25%       { clip-path: inset(28% 0 58% 0); transform: translate( 2px,  1px); }
+  50%       { clip-path: inset(62% 0 22% 0); transform: translate(-1px,  2px); }
+  75%       { clip-path: inset(8%  0 76% 0); transform: translate( 1px, -2px); }
+}
+@keyframes glitch-b {
+  0%, 100% { clip-path: inset(80% 0 6% 0);  transform: translate( 2px,  1px); }
+  30%       { clip-path: inset(45% 0 40% 0); transform: translate(-2px, -1px); }
+  60%       { clip-path: inset(10% 0 75% 0); transform: translate( 1px,  2px); }
 }
 .glitch { position: relative; }
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0.75;
+}
 .glitch::before {
-    content: attr(data-text);
-    position: absolute; inset: 0;
-    color: #00f0ff;
-    animation: glitch-a 2.4s steps(2) infinite;
-    opacity: 0.75;
+  color: #00f0ff;
+  animation: glitch-a 2.4s steps(2) infinite;
+}
+.glitch::after {
+  color: #a855f7;
+  animation: glitch-b 3.1s steps(2) infinite;
+  opacity: 0.4;
 }
 
+/* ─── Slow spin ────────────────────────────────────────────────────────────── */
 @keyframes spin-slow {
-    to { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 .spin-slow { animation: spin-slow 14s linear infinite; }
 
+/* ─── Shimmer / scan line across cards ────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%)  skewX(-15deg); }
+}
+.shimmer-card {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.06) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ─── Neon border pulse ────────────────────────────────────────────────────── */
+@keyframes border-pulse {
+  0%, 100% { box-shadow: 0 0 8px  rgba(0, 240, 255, 0.25); }
+  50%       { box-shadow: 0 0 22px rgba(0, 240, 255, 0.55); }
+}
+.border-pulse-cyan {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
+/* ─── Entrance: fade-up (used by Reveal / JS components) ─────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Tap ripple for touch feedback ────────────────────────────────────────── */
+@keyframes tap-ripple {
+  from { transform: scale(0); opacity: 0.5; }
+  to   { transform: scale(2.5); opacity: 0; }
+}
+.tap-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.tap-ripple::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 240, 255, 0.15);
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+.tap-ripple:active::before {
+  animation: tap-ripple 0.4s ease-out;
+}
+
+/* ─── Mobile touch: enlarge tap targets ────────────────────────────────────── */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    /* don't force min-width as it breaks inline elements */
+  }
+
+  /* Improve tap highlighting */
+  * {
+    -webkit-tap-highlight-color: rgba(0, 240, 255, 0.12);
+  }
+
+  /* On mobile, let glass cards be slightly more opaque for readability */
+  .glass {
+    background: rgba(10, 14, 23, 0.75);
+  }
+}
+
+/* ─── Lenis smooth scroll ──────────────────────────────────────────────────── */
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
+
+/* ─── Mobile section spacing adjustment ──────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Prevent the giant outline numbers from causing horizontal scroll */
+  section { overflow: hidden; }
+}
+
+/* ─── Focus visible: accessible keyboard nav ─────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgba(0, 240, 255, 0.7);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Reduce motion: respect prefers-reduced-motion ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee-track { animation: none; }
+  .t-cursor { animation: none; opacity: 1; }
+  .status-dot { animation: none; }
+}

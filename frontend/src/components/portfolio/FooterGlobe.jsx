@@ -17,7 +17,8 @@ export default function FooterGlobe() {
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    const S = 88;
+    // Responsive size: a bit larger on desktop
+    const S = window.innerWidth < 640 ? 80 : 96;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = S * dpr;
     canvas.height = S * dpr;
@@ -47,7 +48,7 @@ export default function FooterGlobe() {
 
       // Globe glow
       const g = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R);
-      g.addColorStop(0, "rgba(0,240,255,0.10)");
+      g.addColorStop(0, "rgba(0,240,255,0.12)");
       g.addColorStop(1, "rgba(0,20,40,0)");
       ctx.fillStyle = g;
       ctx.beginPath();
@@ -55,7 +56,7 @@ export default function FooterGlobe() {
       ctx.fill();
 
       // Outer ring
-      ctx.strokeStyle = "rgba(0,240,255,0.35)";
+      ctx.strokeStyle = "rgba(0,240,255,0.4)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -85,7 +86,7 @@ export default function FooterGlobe() {
       const t = performance.now() / 1000;
       locs.forEach((l, i) => {
         const p = toXYZ(l.lat, l.lon, rot);
-        if (p.z < 0) return; // back-face culling
+        if (p.z < 0) return;
         const x = cx + p.x * R;
         const y = cy - p.y * R;
         const pulse = 1.6 + Math.sin(t * 3 + i) * 0.7 + Math.min(l.count, 8) * 0.25;
@@ -106,10 +107,7 @@ export default function FooterGlobe() {
   }, [locs]);
 
   const title = locs.length
-    ? `Visitors from: ${locs
-        .slice(0, 6)
-        .map((l) => `${l.city}, ${l.country}`)
-        .join(" · ")}`
+    ? `Visitors from: ${locs.slice(0, 6).map((l) => `${l.city}, ${l.country}`).join(" · ")}`
     : "Awaiting first visitor pings";
 
   return (

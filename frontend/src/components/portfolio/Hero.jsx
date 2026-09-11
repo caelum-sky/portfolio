@@ -80,7 +80,7 @@ function CircuitBoard() {
   );
 }
 
-function TerminalCard({ show }) {
+function TerminalCard({ show, compact = false }) {
   return (
     <div
       data-testid="hero-terminal"
@@ -92,7 +92,7 @@ function TerminalCard({ show }) {
         <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
         <span className="ml-2 font-mono2 text-[11px] text-slate-500">~/john-dagooc — bash</span>
       </div>
-      <div className="p-5 font-mono2 text-[12px] sm:text-[13px] leading-relaxed">
+      <div className={`${compact ? "p-3.5" : "p-5"} font-mono2 text-[11px] sm:text-[12px] leading-relaxed`}>
         <div className="text-slate-300">
           <span className="text-cyan-400">❯</span> cat profile.json
         </div>
@@ -103,11 +103,11 @@ function TerminalCard({ show }) {
             initial={{ opacity: 0, x: -8 }}
             animate={show ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: 1.6 + i * 0.16, duration: 0.4, ease: EASE }}
-            className="pl-4"
+            className="pl-3 sm:pl-4"
           >
             <span className="text-purple-300">{l.k}</span>
             <span className="text-slate-500">: </span>
-            <span className="text-cyan-200">{l.v}</span>
+            <span className="text-cyan-200 break-all">{l.v}</span>
             <span className="text-slate-500">,</span>
           </motion.div>
         ))}
@@ -145,26 +145,31 @@ export default function Hero({ entered, onNavigate, onAsk }) {
       id="home"
       ref={sectionRef}
       onMouseMove={onMouseMove}
-      className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden"
+      className="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden"
       data-testid="hero-section"
     >
-      <div className="max-w-6xl mx-auto px-5 w-full grid lg:grid-cols-2 gap-14 items-center">
+      {/* Mobile ambient glows */}
+      <div className="absolute top-1/4 left-0 w-72 h-72 rounded-full bg-cyan-500/8 blur-[100px] pointer-events-none lg:hidden" />
+      <div className="absolute bottom-1/4 right-0 w-72 h-72 rounded-full bg-purple-500/8 blur-[100px] pointer-events-none lg:hidden" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-5 w-full grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+        {/* LEFT: main content */}
         <div>
           <MaskLine show={entered} delay={0.15}>
             <GreetingRotator show={entered} />
           </MaskLine>
 
-          <div className="mt-6">
+          <div className="mt-5 sm:mt-6">
             <MaskLine show={entered} delay={0.3}>
               <h1
                 data-testid="hero-name"
-                className="font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.04] text-white"
+                className="font-display text-[2.2rem] sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.04] text-white"
               >
                 John Symaiah
               </h1>
             </MaskLine>
             <MaskLine show={entered} delay={0.42}>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.04]">
+              <h1 className="font-display text-[2.2rem] sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.04]">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 text-glow">
                   M. Dagooc.
                 </span>
@@ -173,7 +178,7 @@ export default function Hero({ entered, onNavigate, onAsk }) {
             <MaskLine show={entered} delay={0.54}>
               <p
                 data-testid="hero-tagline"
-                className="font-display text-2xl sm:text-3xl font-bold text-slate-500 mt-3"
+                className="font-display text-xl sm:text-2xl lg:text-3xl font-bold text-slate-500 mt-2 sm:mt-3"
               >
                 I build things.
               </p>
@@ -185,44 +190,44 @@ export default function Hero({ entered, onNavigate, onAsk }) {
             animate={entered ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.7, duration: 0.7, ease: EASE }}
           >
-            <div className="flex items-center gap-4 mt-7">
+            <div className="flex items-center gap-3 sm:gap-4 mt-6 sm:mt-7">
               {imgOk ? (
                 <img
                   src={PROFILE_IMG}
                   alt="John Symaiah M. Dagooc"
                   data-testid="hero-profile-picture"
                   onError={() => setImgOk(false)}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-cyan-400/50 shadow-[0_0_25px_rgba(0,240,255,0.35)]"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-cyan-400/50 shadow-[0_0_25px_rgba(0,240,255,0.35)] shrink-0"
                 />
               ) : (
                 <div
                   data-testid="hero-profile-picture"
-                  className="w-16 h-16 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-cyan-500/30 to-purple-600/30 flex items-center justify-center shadow-[0_0_25px_rgba(0,240,255,0.35)]"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-cyan-400/50 bg-gradient-to-br from-cyan-500/30 to-purple-600/30 flex items-center justify-center shadow-[0_0_25px_rgba(0,240,255,0.35)] shrink-0"
                 >
                   <Rocket className="w-6 h-6 text-cyan-300" />
                 </div>
               )}
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-200">Full-Stack & AI Developer</span>
-                <span className="font-mono2 text-xs text-slate-500">
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-semibold text-slate-200 truncate">Full-Stack & AI Developer</span>
+                <span className="font-mono2 text-[10px] sm:text-xs text-slate-500 truncate">
                   BSIT Graduate · Bukidnon State University
                 </span>
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-2 mt-5 rounded-full border border-emerald-400/30 bg-emerald-400/5 px-3.5 py-1.5">
+            <div className="inline-flex items-center gap-2 mt-4 sm:mt-5 rounded-full border border-emerald-400/30 bg-emerald-400/5 px-3.5 py-1.5">
               <span className="status-dot" />
-              <span className="font-mono2 text-[11px] tracking-widest uppercase text-emerald-300">
+              <span className="font-mono2 text-[10px] sm:text-[11px] tracking-widest uppercase text-emerald-300">
                 Open to opportunities
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2 mt-5">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-4 sm:mt-5">
               {CHIPS.map((c, i) => (
                 <span
                   key={c}
                   data-testid={`hero-chip-${i}`}
-                  className={`rounded-full border px-3 py-1 font-mono2 text-[11px] tracking-wide ${
+                  className={`rounded-full border px-2.5 sm:px-3 py-1 font-mono2 text-[10px] sm:text-[11px] tracking-wide ${
                     i === 0
                       ? "border-yellow-400/50 text-yellow-300 bg-yellow-400/10"
                       : "border-cyan-400/25 text-slate-300 bg-white/[0.03]"
@@ -233,37 +238,39 @@ export default function Hero({ entered, onNavigate, onAsk }) {
               ))}
             </div>
 
-            <p className="text-slate-400 text-sm sm:text-base leading-relaxed mt-6 max-w-xl">
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed mt-5 sm:mt-6 max-w-xl">
               Fresh BSIT graduate from Bukidnon State University who ships production systems end to
               end — a construction &amp; trades marketplace, a university fleet-management platform,
               and a multi-role booking marketplace — across React, Node.js, Firebase, and Laravel,
               backed by two Cisco CCNA certifications.
             </p>
-            <p className="font-mono2 text-[11px] tracking-[0.25em] text-slate-600 uppercase mt-3">
+            <p className="font-mono2 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] text-slate-600 uppercase mt-3">
               Banking · Healthcare · Construction Mgmt · AI Systems
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 mt-8">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
               <button
                 data-testid="resume-button"
                 onClick={() => onNavigate("resume")}
-                className="group inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 px-7 py-3 font-mono2 text-sm font-bold tracking-wide text-[#030509] shadow-[0_0_30px_rgba(0,240,255,0.35)] transition-shadow hover:shadow-[0_0_45px_rgba(0,240,255,0.55)]"
+                className="group inline-flex items-center gap-2 sm:gap-2.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 px-5 sm:px-7 py-2.5 sm:py-3 font-mono2 text-xs sm:text-sm font-bold tracking-wide text-[#030509] shadow-[0_0_30px_rgba(0,240,255,0.35)] transition-shadow hover:shadow-[0_0_45px_rgba(0,240,255,0.55)] active:scale-95 touch-action-manipulation"
               >
-                <FileDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />
+                <FileDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-y-0.5" />
                 Resume
               </button>
               <button
                 data-testid="ask-me-button"
                 onClick={onAsk}
-                className="inline-flex items-center gap-2.5 rounded-full border border-purple-400/50 bg-purple-400/10 px-7 py-3 font-mono2 text-sm font-bold tracking-wide text-purple-200 transition-colors hover:bg-purple-400/20"
+                className="inline-flex items-center gap-2 sm:gap-2.5 rounded-full border border-purple-400/50 bg-purple-400/10 px-5 sm:px-7 py-2.5 sm:py-3 font-mono2 text-xs sm:text-sm font-bold tracking-wide text-purple-200 transition-colors hover:bg-purple-400/20 active:scale-95 touch-action-manipulation"
               >
-                <Terminal className="w-4 h-4" />
+                <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Ask me anything
               </button>
             </div>
           </motion.div>
         </div>
 
+        {/* RIGHT: desktop full terminal with circuit + mobile compact terminal */}
+        {/* Desktop only: full 3D card with circuit board, orbs, floating badges */}
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={entered ? { opacity: 1, scale: 1 } : {}}
@@ -303,6 +310,40 @@ export default function Hero({ entered, onNavigate, onAsk }) {
               </motion.div>
             </div>
           </motion.div>
+        </motion.div>
+
+        {/* Mobile only: compact terminal card (no circuit board, no 3D) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={entered ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 1.1, duration: 0.7, ease: EASE }}
+          className="lg:hidden mt-2"
+        >
+          {/* Floating badges row */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            <motion.span
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="glass border border-cyan-400/30 rounded-full px-3 py-1.5 font-mono2 text-[10px] text-cyan-200"
+            >
+              AI &amp; ML
+            </motion.span>
+            <motion.span
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              className="glass border border-red-400/30 rounded-full px-3 py-1.5 font-mono2 text-[10px] text-red-300"
+            >
+              Laravel &amp; Firebase
+            </motion.span>
+            <motion.span
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="glass border border-emerald-400/30 rounded-full px-3 py-1.5 font-mono2 text-[10px] text-emerald-300"
+            >
+              CCNA Certified
+            </motion.span>
+          </div>
+          <TerminalCard show={entered} compact />
         </motion.div>
       </div>
 

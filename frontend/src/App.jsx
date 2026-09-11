@@ -19,6 +19,14 @@ import Contact from "@/components/portfolio/Contact";
 import Footer from "@/components/portfolio/Footer";
 import AskMeModal from "@/components/portfolio/AskMeModal";
 
+/**
+ * Whether the device uses a coarse pointer (touch screen).
+ * Evaluated once at module level — no need to re-check at runtime.
+ */
+const IS_TOUCH = typeof window !== "undefined"
+  ? window.matchMedia("(pointer: coarse)").matches
+  : false;
+
 function App() {
   const [entered, setEntered] = useState(false);
   const [amaOpen, setAmaOpen] = useState(false);
@@ -26,13 +34,28 @@ function App() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 26 });
 
-  // Fire-and-forget visitor ping for the globe
+  /**
+   * Visitor ping — fire-and-forget, sent once on page load.
+   *
+   * • When VITE_BACKEND_URL is set (e.g. https://…onrender.com) the full URL is used.
+   * • When VITE_BACKEND_URL is an empty string (Firebase Hosting with a rewrite rule)
+   *   the URL correctly becomes "/api/visits/ping" — handled by the hosting rewrite.
+   * • The ping is intentionally fired immediately (not gated behind `entered`)
+   *   so we capture visits even when users skip the intro quickly.
+   */
   useEffect(() => {
     const api = (import.meta.env.VITE_BACKEND_URL || "") + "/api";
     fetch(`${api}/visits/ping`, { method: "POST" }).catch(() => {});
   }, []);
 
+  /**
+   * Lenis smooth-scroll — skip entirely on touch devices.
+   * On coarse-pointer (mobile/tablet) native momentum scroll feels better and
+   * Lenis can interfere with iOS rubber-band bounce.
+   */
   useEffect(() => {
+    if (IS_TOUCH) return;
+
     const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
     lenisRef.current = lenis;
     let raf;
@@ -44,9 +67,11 @@ function App() {
     return () => {
       cancelAnimationFrame(raf);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
+  // Lock scroll while WelcomeGate is visible
   useEffect(() => {
     const lenis = lenisRef.current;
     if (!entered) {
@@ -76,6 +101,7 @@ function App() {
       <Starfield />
       <div className="grain" />
 
+      {/* Scroll progress bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500"
         style={{ scaleX: progress }}

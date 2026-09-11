@@ -31,20 +31,31 @@ function CountUp({ value, suffix }) {
 
 export default function About() {
   return (
-    <section id="about" className="relative py-28" data-testid="about-section">
-      <div className="max-w-6xl mx-auto px-5">
-        <SectionHead index="01" eyebrow="Who I Am" title={<>Builder. Learner. <span className="text-cyan-300">Vibe Coder.</span></>} />
-        <div className="grid lg:grid-cols-2 gap-14">
+    <section id="about" className="relative py-20 sm:py-28 overflow-hidden" data-testid="about-section">
+      {/* Ambient */}
+      <div className="absolute right-0 top-1/3 w-96 h-96 rounded-full bg-purple-500/5 blur-[130px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-5">
+        <SectionHead
+          index="01"
+          eyebrow="Who I Am"
+          title={<>Builder. Learner. <span className="text-cyan-300">Vibe Coder.</span></>}
+        />
+
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14">
+          {/* Left column */}
           <div>
             <Reveal>
-              <div className="inline-flex items-center gap-3 rounded-xl border border-yellow-400/30 bg-yellow-400/5 px-4 py-3 mb-6">
-                <GraduationCap className="w-5 h-5 text-yellow-300" />
-                <div>
-                  <p className="text-sm font-semibold text-yellow-200">BSIT Graduate — Class of 2026</p>
-                  <p className="font-mono2 text-[11px] text-slate-500">Bukidnon State University · Milestone unlocked</p>
+              {/* Graduation badge */}
+              <div className="inline-flex items-center gap-3 rounded-xl border border-yellow-400/30 bg-yellow-400/5 px-3 sm:px-4 py-2.5 sm:py-3 mb-5 sm:mb-6">
+                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-semibold text-yellow-200">BSIT Graduate — Class of 2026</p>
+                  <p className="font-mono2 text-[10px] sm:text-[11px] text-slate-500">Bukidnon State University · Milestone unlocked</p>
                 </div>
               </div>
-              <div className="space-y-4 text-slate-400 text-sm sm:text-base leading-relaxed">
+
+              <div className="space-y-3 sm:space-y-4 text-slate-400 text-sm sm:text-base leading-relaxed">
                 <p>
                   I'm <strong className="text-slate-200">John Symaiah M. Dagooc</strong>, a freshly
                   minted <strong className="text-slate-200">BSIT graduate</strong> from{" "}
@@ -59,35 +70,43 @@ export default function About() {
                 <p>
                   My real-world training as a{" "}
                   <strong className="text-slate-200">System Integrator Trainee</strong> at Project
-                  Moonshot IT Solutions taught me to read a system end to end — gathering
-                  requirements, spotting bottlenecks, and revising workflows as things change.
+                  Moonshot IT Solutions taught me to read a system end to end — gathering requirements,
+                  spotting bottlenecks, and revising workflows as things change.
                 </p>
               </div>
             </Reveal>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10">
+            {/* Stats grid — 2 cols on xs, 4 on sm+ */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10">
               {STATS.map((s, i) => (
                 <Reveal key={s.label} delay={i * 0.07}>
-                  <div
+                  <motion.div
                     data-testid={`stat-${s.label.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="glass border border-cyan-500/15 rounded-xl p-4 text-center"
+                    whileHover={{ scale: 1.04, borderColor: s.gold ? "rgba(250,204,21,0.4)" : "rgba(0,240,255,0.35)" }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="glass border border-cyan-500/15 rounded-xl p-3 sm:p-4 text-center"
                   >
-                    <div className={`font-display text-2xl sm:text-3xl font-black ${s.gold ? "text-yellow-300" : "text-cyan-300"}`}>
+                    <div
+                      className={`font-display text-xl sm:text-2xl lg:text-3xl font-black ${
+                        s.gold ? "text-yellow-300" : "text-cyan-300"
+                      }`}
+                    >
                       <CountUp value={s.value} suffix={s.suffix} />
                     </div>
-                    <div className="font-mono2 text-[10px] tracking-widest uppercase text-slate-500 mt-1">
+                    <div className="font-mono2 text-[9px] sm:text-[10px] tracking-widest uppercase text-slate-500 mt-0.5 sm:mt-1 leading-tight">
                       {s.label}
                     </div>
-                  </div>
+                  </motion.div>
                 </Reveal>
               ))}
             </div>
 
-            <div className="mt-10 space-y-5">
+            {/* Skill bars */}
+            <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-5">
               {SKILL_BARS.map((s, i) => (
                 <Reveal key={s.name} delay={i * 0.05}>
                   <div>
-                    <div className="flex justify-between font-mono2 text-xs text-slate-400 mb-1.5">
+                    <div className="flex justify-between font-mono2 text-[10px] sm:text-xs text-slate-400 mb-1 sm:mb-1.5">
                       <span>{s.name}</span>
                       <span className={s.gold ? "text-yellow-300" : "text-cyan-300"}>{s.pct}%</span>
                     </div>
@@ -97,12 +116,20 @@ export default function About() {
                         whileInView={{ width: `${s.pct}%` }}
                         viewport={{ once: true, margin: "-40px" }}
                         transition={{ duration: 1.2, delay: 0.15, ease: EASE }}
-                        className={`h-full rounded-full ${
+                        className={`h-full rounded-full relative overflow-hidden ${
                           s.gold
                             ? "bg-gradient-to-r from-yellow-500 to-amber-300"
                             : "bg-gradient-to-r from-cyan-400 to-blue-600"
                         }`}
-                      />
+                      >
+                        {/* Shimmer effect */}
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          initial={{ x: "-100%" }}
+                          animate={{ x: "200%" }}
+                          transition={{ duration: 1.5, delay: 1.4 + i * 0.1, ease: "easeInOut" }}
+                        />
+                      </motion.div>
                     </div>
                   </div>
                 </Reveal>
@@ -110,45 +137,55 @@ export default function About() {
             </div>
           </div>
 
+          {/* Right column */}
           <div>
             <Reveal delay={0.1}>
-              <div className="glass border border-cyan-500/20 rounded-xl overflow-hidden mb-8">
-                <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5 bg-white/[0.03]">
+              {/* Code block — scrollable on mobile to prevent overflow */}
+              <div className="glass border border-cyan-500/20 rounded-xl overflow-hidden mb-6 sm:mb-8">
+                <div className="flex items-center gap-2 px-3 sm:px-4 py-2.5 border-b border-white/5 bg-white/[0.03]">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
                 </div>
-                <div className="p-5 font-mono2 text-[12px] sm:text-[13px] leading-relaxed">
-                  <span className="text-purple-300">const</span> <span className="text-cyan-300">dev</span>{" "}
-                  <span className="text-slate-500">= {"{"}</span>
-                  <div className="pl-4 text-slate-400">
-                    <div>name: <span className="text-cyan-200">"John Symaiah M. Dagooc"</span>,</div>
-                    <div>role: <span className="text-cyan-200">"Full-Stack Developer & Systems Integrator"</span>,</div>
-                    <div>status: <span className="text-yellow-300">"BSIT Graduate · 2026"</span>,</div>
-                    <div>stack: [<span className="text-purple-300">"Laravel", "React", "Firebase", "Express"</span>],</div>
-                    <div>certs: [<span className="text-purple-300">"CCNA ITN", "CCNA SRWE"</span>],</div>
-                    <div>motto: <span className="text-cyan-200">"Code. Ship. Rep."</span></div>
+                <div className="p-4 sm:p-5 font-mono2 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed overflow-x-auto">
+                  <div className="min-w-0">
+                    <span className="text-purple-300">const</span>{" "}
+                    <span className="text-cyan-300">dev</span>{" "}
+                    <span className="text-slate-500">= {"{"}</span>
+                    <div className="pl-3 sm:pl-4 text-slate-400">
+                      <div className="truncate">name: <span className="text-cyan-200">"John Symaiah M. Dagooc"</span>,</div>
+                      <div className="truncate">role: <span className="text-cyan-200">"Full-Stack Developer & Systems Integrator"</span>,</div>
+                      <div className="truncate">status: <span className="text-yellow-300">"BSIT Graduate · 2026"</span>,</div>
+                      <div className="truncate">stack: [<span className="text-purple-300">"Laravel", "React", "Firebase"</span>],</div>
+                      <div className="truncate">certs: [<span className="text-purple-300">"CCNA ITN", "CCNA SRWE"</span>],</div>
+                      <div className="truncate">motto: <span className="text-cyan-200">"Code. Ship. Rep."</span></div>
+                    </div>
+                    <span className="text-slate-500">{"};"}</span>
+                    <div className="text-slate-600 mt-1 text-[10px] sm:text-[11px] truncate">
+                      {"// Shipping real systems for Philippine businesses & BukSU."}
+                    </div>
                   </div>
-                  <span className="text-slate-500">{"};"}</span>
-                  <div className="text-slate-600 mt-1">{"// Shipping real systems for Philippine businesses & BukSU."}</div>
                 </div>
               </div>
             </Reveal>
 
+            {/* Tag groups */}
             {TAG_GROUPS.map((g, gi) => (
               <Reveal key={g.title} delay={gi * 0.06}>
-                <div className="mb-6">
-                  <div className="font-mono2 text-[11px] tracking-[0.25em] uppercase text-slate-500 mb-2.5">
+                <div className="mb-5 sm:mb-6">
+                  <div className="font-mono2 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-slate-500 mb-2 sm:mb-2.5">
                     {g.title}
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {g.tags.map((t) => (
-                      <span
+                      <motion.span
                         key={t}
-                        className={`rounded-full border px-3 py-1 font-mono2 text-[11px] ${TAG_COLORS[g.color]}`}
+                        whileHover={{ scale: 1.06 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className={`rounded-full border px-2.5 sm:px-3 py-0.5 sm:py-1 font-mono2 text-[10px] sm:text-[11px] ${TAG_COLORS[g.color]} cursor-default`}
                       >
                         {t}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                 </div>
