@@ -355,7 +355,7 @@ export default function Hero({ entered, onNavigate, onAsk }) {
         transition={{ delay: 2 }}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-300 transition-colors"
       >
-        <span className="font-mono2 text-[10px] tracking-[0.35em] uppercase">scroll</span>
+        
         <motion.span animate={{ y: [0, 6, 0] }} transition={{ duration: 1.6, repeat: Infinity }}>
           ▾
         </motion.span>
