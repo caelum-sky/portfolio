@@ -86,8 +86,8 @@
   }
 }
 
-/* ─── Cursor: disable on touch devices ──────────────────────────────────── */
-@media (pointer: fine) {
+/* ─── Cursor: disable for custom galaxy cursor ───────────────────────────── */
+@media (pointer: fine), (pointer: coarse) {
   body, body * { cursor: none !important; }
 }
 

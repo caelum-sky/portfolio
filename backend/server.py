@@ -32,6 +32,8 @@ CORS_ORIGINS: list[str] = os.environ.get("CORS_ORIGINS", "*").split(",")
 # Path to the JSON file that stores visitor locations.
 # On Render this lives inside the service's ephemeral disk — fine for a cosmetic globe.
 VISITS_FILE = ROOT_DIR / "visitor_locations.json"
+# Maximum number of visitor entries to store (oldest will be removed)
+MAX_VISITS = 1000
 
 # ── In-memory visitor store (backed by the JSON file) ─────────────────────────
 
@@ -194,6 +196,11 @@ async def record_visit(request: Request):
                 existing["lon"] = geo["lon"]
             else:
                 _visits[key] = {**geo, "count": 1, "first_seen": now, "last_seen": now}
+            # Enforce maximum number of visitor entries
+            if len(_visits) > MAX_VISITS:
+                # Sort by last_seen (oldest first) and keep the most recent MAX_VISITS
+                sorted_items = sorted(_visits.items(), key=lambda x: x[1].get('last_seen', ''))
+                _visits = dict(sorted_items[-MAX_VISITS:])
             try:
                 _save_visits(_visits)
             except Exception as exc:

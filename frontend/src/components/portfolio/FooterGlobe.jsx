@@ -5,6 +5,7 @@ const API = (import.meta.env.VITE_BACKEND_URL || "") + "/api";
 export default function FooterGlobe() {
   const ref = useRef(null);
   const [locs, setLocs] = useState([]);
+  const rafRef = useRef(null);
 
   useEffect(() => {
     fetch(`${API}/visits/geo`)
@@ -16,6 +17,84 @@ export default function FooterGlobe() {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
+
+    // Check for reduced motion preference
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reducedMotion.matches) {
+      // If reduced motion is preferred, we still want to show the globe but without animation
+      // We'll draw a static version once
+      const ctx = canvas.getContext("2d");
+      // Responsive size: a bit larger on desktop
+      const S = window.innerWidth < 640 ? 80 : 96;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = S * dpr;
+      canvas.height = S * dpr;
+      canvas.style.width = `${S}px`;
+      canvas.style.height = `${S}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const cx = S / 2;
+      const cy = S / 2;
+      const R = S / 2 - 6;
+
+      // Draw static globe
+      const g = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R);
+      g.addColorStop(0, "rgba(0,240,255,0.12)");
+      g.addColorStop(1, "rgba(0,20,40,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outer ring
+      ctx.strokeStyle = "rgba(0,240,255,0.4)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Latitude lines
+      for (let lat = -60; lat <= 60; lat += 30) {
+        const p = { x: 0, y: Math.sin((lat * Math.PI) / 180) }; // Simplified for static
+        const r = Math.cos((lat * Math.PI) / 180) * R;
+        ctx.strokeStyle = "rgba(0,240,255,0.14)";
+        ctx.beginPath();
+        ctx.ellipse(cx, cy - p.y * R, r, r * 0.18, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Longitude lines (static)
+      for (let lon = 0; lon < 180; lon += 30) {
+        const rx = Math.abs(Math.sin((lon * Math.PI) / 180)) * R;
+        ctx.strokeStyle = `rgba(0,240,255,${0.05 + Math.abs(Math.cos((lon * Math.PI) / 180)) * 0.1})`;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, Math.max(rx, 0.5), R, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Visitor dots (static)
+      locs.forEach((l, i) => {
+        const la = (l.lat * Math.PI) / 180;
+        const lo = (l.lon * Math.PI) / 180;
+        const x = Math.cos(la) * Math.sin(lo);
+        const y = Math.sin(la);
+        const z = Math.cos(la) * Math.cos(lo);
+        if (z < 0) return;
+        const screenX = cx + x * R;
+        const screenY = cy - y * R;
+        const pulse = 1.6 + Math.min(l.count, 8) * 0.25; // Static pulse based on count
+        ctx.fillStyle = "rgba(255,215,0,0.95)";
+        ctx.shadowColor = "rgba(255,215,0,0.9)";
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, pulse, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      return; // No animation loop
+    }
+
+    // Normal animation loop
     const ctx = canvas.getContext("2d");
     // Responsive size: a bit larger on desktop
     const S = window.innerWidth < 640 ? 80 : 96;
@@ -40,7 +119,6 @@ export default function FooterGlobe() {
     };
 
     let rot = 0;
-    let raf;
 
     const draw = () => {
       ctx.clearRect(0, 0, S, S);
@@ -99,11 +177,11 @@ export default function FooterGlobe() {
         ctx.shadowBlur = 0;
       });
 
-      raf = requestAnimationFrame(draw);
+      rafRef.current = requestAnimationFrame(draw);
     };
 
-    raf = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf);
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
   }, [locs]);
 
   const title = locs.length

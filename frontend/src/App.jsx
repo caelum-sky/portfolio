@@ -97,6 +97,15 @@ function App() {
 
   return (
     <div className="relative min-h-screen bg-[#030509] text-slate-100 overflow-x-hidden">
+      {/* Skip to main content */}
+      <a
+        href="#main-content"
+        className="pointer-none absolute top-0 left-0 p-2 bg-white/[0.04] text-xs sm:text-sm text-slate-500 focus:pointer-auto focus:bg-white/[0.08] focus:text-cyan-300 focus:outline-none focus:outline-2 focus:outline-offset-2 focus:outline-cyan-400"
+        data-testid="skip-link"
+      >
+        Skip to main content
+      </a>
+
       <GalaxyCursor />
       <Starfield />
       <div className="grain" />
@@ -114,7 +123,7 @@ function App() {
 
       <Navbar entered={entered} onNavigate={scrollTo} onAsk={() => setAmaOpen(true)} />
 
-      <main className="relative z-10">
+      <main id="main-content" className="relative z-10">
         <Hero entered={entered} onNavigate={scrollTo} onAsk={() => setAmaOpen(true)} />
         <Marquee />
         <About />

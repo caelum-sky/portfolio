@@ -8,13 +8,21 @@ const API = (import.meta.env.VITE_BACKEND_URL || "") + "/api";
 const SOC_ICONS = { github: Github, linkedin: Linkedin, mail: Mail, facebook: Facebook };
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", message: "", website: "" });
   const [sending, setSending] = useState(false);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = async (e) => {
     e.preventDefault();
+    // Honeypot check: if website field is filled, assume spam
+    if (form.website.trim() !== "") {
+      // Silently fail to frustrate bots
+      toast.success("Transmission received — I'll get back to you soon.");
+      setForm({ name: "", email: "", message: "", website: "" });
+      setSending(false);
+      return;
+    }
     setSending(true);
     try {
       const res = await fetch(`${API}/contact`, {
@@ -24,7 +32,7 @@ export default function Contact() {
       });
       if (!res.ok) throw new Error("non-2xx");
       toast.success("Transmission received — I'll get back to you soon.");
-      setForm({ name: "", email: "", message: "" });
+      setForm({ name: "", email: "", message: "", website: "" });
     } catch {
       toast.error("Transmission failed — try emailing me directly instead.");
     } finally {
@@ -54,7 +62,7 @@ export default function Contact() {
           sub="Have a project in mind? I just graduated and I'm ready — let's build something."
         />
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
+        <div className="lg:grid-cols-2 gap-8 lg:gap-14">
           {/* Socials */}
           <Reveal>
             <div className="space-y-2.5 sm:space-y-3">
@@ -150,6 +158,22 @@ export default function Contact() {
                   onChange={set("message")}
                   placeholder="Tell me about your project..."
                   className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-cyan-400/60 focus:shadow-[0_0_18px_rgba(0,240,255,0.15)] transition-all resize-none"
+                />
+              </div>
+
+              {/* Honeypot field */}
+              <div className="absolute left-[-9999px]">
+                <label htmlFor="contact-website" className="sr-only">
+                  Website
+                </label>
+                <input
+                  id="contact-website"
+                  type="text"
+                  name="website"
+                  value={form.website}
+                  onChange={set("website")}
+                  tabIndex={-1}
+                  autoComplete="off"
                 />
               </div>
 

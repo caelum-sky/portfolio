@@ -4,7 +4,6 @@ export default function GalaxyCursor() {
   const ref = useRef(null);
 
   useEffect(() => {
-    if (window.matchMedia("(pointer: coarse)").matches) return undefined;
     const canvas = ref.current;
     const ctx = canvas.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -40,16 +39,28 @@ export default function GalaxyCursor() {
     }
 
     const onMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      // Handle both mouse and touch events
+      let clientX, clientY;
+      if (e.type.startsWith('touch')) {
+        const touch = e.touches[0] || e.changedTouches[0];
+        if (!touch) return;
+        clientX = touch.clientX;
+        clientY = touch.clientY;
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+
+      mouse.x = clientX;
+      mouse.y = clientY;
       hover =
         e.target instanceof Element &&
         !!e.target.closest("a,button,input,textarea,select,[data-hoverable]");
       const n = hover ? 4 : 2;
       for (let i = 0; i < n; i += 1) {
         stars.push({
-          x: e.clientX + (Math.random() - 0.5) * 10,
-          y: e.clientY + (Math.random() - 0.5) * 10,
+          x: clientX + (Math.random() - 0.5) * 10,
+          y: clientY + (Math.random() - 0.5) * 10,
           vx: (Math.random() - 0.5) * 1.2,
           vy: (Math.random() - 0.5) * 1.2 - 0.2,
           life: 1,
@@ -61,7 +72,11 @@ export default function GalaxyCursor() {
       }
       if (stars.length > 220) stars.splice(0, stars.length - 220);
     };
+
+    // Add event listeners for both mouse and touch
     window.addEventListener("mousemove", onMove);
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchstart", onMove, { passive: true });
 
     let rot = 0;
     let raf;
@@ -132,11 +147,11 @@ export default function GalaxyCursor() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchstart", onMove);
       window.removeEventListener("resize", resize);
     };
   }, []);
-
-  if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return null;
 
   return (
     <canvas
