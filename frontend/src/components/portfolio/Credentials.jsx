@@ -37,8 +37,9 @@ export function Achievements() {
                   data-testid={`achievement-card-${i}`}
                   whileHover={{ borderColor: "rgba(250,204,21,0.5)", y: -3 }}
                   whileTap={{ scale: 0.98 }}
+                  whileFocus={{ borderColor: "rgba(250,204,21,0.5)", y: -3 }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="flex items-start gap-3 sm:gap-4 glass border border-yellow-400/20 rounded-2xl p-4 sm:p-6 hover:shadow-[0_0_30px_rgba(255,215,0,0.08)] transition-shadow"
+                  className="flex items-start gap-3 sm:gap-4 glass border border-yellow-400/20 rounded-2xl p-4 sm:p-6 hover:shadow-[0_0_30px_rgba(255,215,0,0.08)] focus-visible:shadow-[0_0_30px_rgba(255,215,0,0.08)] transition-shadow"
                 >
                   <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-xl border border-yellow-400/40 bg-yellow-400/10 flex items-center justify-center">
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-300" />
@@ -81,8 +82,9 @@ export function Certifications() {
                   data-testid={`certification-card-${i}`}
                   whileHover={{ borderColor: "rgba(0,240,255,0.4)", y: -3 }}
                   whileTap={{ scale: 0.98 }}
+                  whileFocus={{ borderColor: "rgba(0,240,255,0.4)", y: -3 }}
                   transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="h-full glass border border-cyan-500/15 rounded-2xl p-4 sm:p-6 flex flex-col hover:shadow-[0_0_35px_rgba(0,114,255,0.1)] transition-shadow"
+                  className="h-full glass border border-cyan-500/15 rounded-2xl p-4 sm:p-6 flex flex-col hover:shadow-[0_0_35px_rgba(0,114,255,0.1)] focus-visible:shadow-[0_0_35px_rgba(0,114,255,0.1)] transition-shadow"
                 >
                   <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-xl border border-cyan-400/30 bg-cyan-400/10 flex items-center justify-center">
