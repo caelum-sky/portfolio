@@ -21,7 +21,7 @@ from typing import Optional
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, APIRouter, BackgroundTasks, Request
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
@@ -132,6 +132,10 @@ logger = logging.getLogger(__name__)
 
 _HEADER_INJECTION_RE = re.compile(r"[\r\n]+")
 
+# Same rule as the frontend (contactValidation.js) — deliberately dependency-free
+# so the app can never be broken by a stale build env missing email-validator.
+_EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$")
+
 
 class ContactMessageCreate(BaseModel):
     """Inbound contact-form payload. Extra honeypot fields are accepted."""
@@ -139,10 +143,17 @@ class ContactMessageCreate(BaseModel):
     model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
     name: str = Field(min_length=2, max_length=120)
-    email: EmailStr = Field(max_length=200)
+    email: str = Field(max_length=200)
     message: str = Field(min_length=10, max_length=5000)
     # Honeypot — real users never see/fill this field
     website: str = Field(default="", max_length=200)
+
+    @field_validator("email")
+    @classmethod
+    def _valid_email(cls, v: str) -> str:
+        if not _EMAIL_RE.match(v):
+            raise ValueError("invalid email address")
+        return v.lower()
 
     @field_validator("name")
     @classmethod

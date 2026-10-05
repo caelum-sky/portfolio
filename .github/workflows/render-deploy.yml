@@ -1,6 +1,10 @@
 # .github/workflows/render-deploy.yml
 name: Deploy Backend → Render
 
+# NOTE: Render's built-in Auto-Deploy already redeploys the service on every
+# push to main. This workflow is an OPTIONAL extra trigger via deploy hook —
+# it succeeds silently when the secret isn't configured instead of failing.
+
 on:
   push:
     branches: [main]
@@ -25,8 +29,8 @@ jobs:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
           if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not configured."
-            exit 1
+            echo "::notice::RENDER_DEPLOY_HOOK_URL secret not set — relying on Render Auto-Deploy (already enabled). Nothing to do."
+            exit 0
           fi
 
           http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK_URL" \
