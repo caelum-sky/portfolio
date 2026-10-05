@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { HardHat, Truck, CalendarCheck, Github, ArrowUpRight } from "lucide-react";
+import { HardHat, Truck, CalendarCheck, GraduationCap, Github, ArrowUpRight, Sparkles } from "lucide-react";
 import { Reveal, SectionHead } from "./Section";
 import { PROJECTS } from "../../data/portfolio";
 
-const ICONS = { helmet: HardHat, truck: Truck, calendar: CalendarCheck };
+const ICONS = { helmet: HardHat, truck: Truck, calendar: CalendarCheck, school: GraduationCap };
 
 export default function Projects() {
   return (
@@ -16,24 +16,35 @@ export default function Projects() {
           index="04"
           eyebrow="Portfolio"
           title="Projects"
-          sub="Full-stack systems I've built and shipped — marketplace, fleet management, and booking."
+          sub="Full-stack systems I've built and shipped — campus information systems, marketplace, fleet management, and booking."
         />
 
-        {/* Grid: 1 col on xs, 2 col on sm, 3 col on md+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        {/* Grid: 1 col on xs, 2 col on sm–lg, 4 col on xl so all four projects share one row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
           {PROJECTS.map((p, i) => {
-            const Icon = ICONS[p.icon];
+            const Icon = ICONS[p.icon] || HardHat;
             return (
-              <Reveal key={p.title} delay={i * 0.08}>
+              <Reveal key={p.title} delay={i * 0.08} className="h-full">
                 <motion.article
                   data-testid={`project-card-${i}`}
                   whileHover={{ y: -6 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 240, damping: 20 }}
-                  className="group h-full glass border border-cyan-500/15 rounded-2xl overflow-hidden hover:border-cyan-400/40 hover:shadow-[0_0_50px_rgba(0,114,255,0.15)] transition-all flex flex-col"
+                  className="group relative h-full glass border border-cyan-500/15 rounded-2xl overflow-hidden hover:border-cyan-400/40 hover:shadow-[0_0_50px_rgba(0,114,255,0.15)] transition-all flex flex-col"
                 >
+                  {/* "Latest" ribbon */}
+                  {p.badge && (
+                    <div
+                      data-testid={`project-badge-${i}`}
+                      className="absolute top-3 right-3 z-20 inline-flex items-center gap-1 rounded-full border border-yellow-400/50 bg-[#030509]/80 backdrop-blur px-2.5 py-1 font-mono2 text-[9px] sm:text-[10px] tracking-widest uppercase text-yellow-300 shadow-[0_0_16px_rgba(255,215,0,0.25)]"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {p.badge}
+                    </div>
+                  )}
+
                   {/* Card header / icon area */}
-                  <div className="relative h-32 sm:h-40 bg-gradient-to-br from-[#0a0e17] via-[#0d1526] to-[#120a24] flex items-center justify-center overflow-hidden border-b border-cyan-500/10">
+                  <div className="relative h-32 sm:h-36 xl:h-32 bg-gradient-to-br from-[#0a0e17] via-[#0d1526] to-[#120a24] flex items-center justify-center overflow-hidden border-b border-cyan-500/10">
                     {/* Grid background */}
                     <div
                       className="absolute inset-0 opacity-[0.13]"
@@ -49,11 +60,11 @@ export default function Projects() {
                   </div>
 
                   {/* Card body */}
-                  <div className="p-4 sm:p-6 flex flex-col flex-1">
-                    <h3 className="font-display text-base sm:text-xl font-bold text-white mb-1.5 sm:mb-2 leading-snug">
+                  <div className="p-4 sm:p-5 xl:p-4 flex flex-col flex-1">
+                    <h3 className="font-display text-base sm:text-lg xl:text-base font-bold text-white mb-1.5 sm:mb-2 leading-snug">
                       {p.title}
                     </h3>
-                    <p className="text-slate-400 text-xs sm:text-sm leading-relaxed flex-1">{p.desc}</p>
+                    <p className="text-slate-400 text-xs sm:text-sm xl:text-xs leading-relaxed flex-1">{p.desc}</p>
 
                     {/* Tech tags */}
                     <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-3 sm:mt-4">

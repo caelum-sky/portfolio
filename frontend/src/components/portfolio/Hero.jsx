@@ -240,9 +240,9 @@ export default function Hero({ entered, onNavigate, onAsk }) {
 
             <p className="text-slate-400 text-sm sm:text-base leading-relaxed mt-5 sm:mt-6 max-w-xl">
               Fresh BSIT graduate from Bukidnon State University who ships production systems end to
-              end — a construction &amp; trades marketplace, a university fleet-management platform,
-              and a multi-role booking marketplace — across React, Node.js, Firebase, and Laravel,
-              backed by two Cisco CCNA certifications.
+              end — a student information system, a construction &amp; trades marketplace, a university
+              fleet-management platform, and a multi-role booking marketplace — across React, Node.js,
+              Firebase, and Laravel, backed by two Cisco CCNA certifications.
             </p>
             <p className="font-mono2 text-[10px] sm:text-[11px] tracking-[0.2em] sm:tracking-[0.25em] text-slate-600 uppercase mt-3">
               Banking · Healthcare · Construction Mgmt · AI Systems

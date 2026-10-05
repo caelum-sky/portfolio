@@ -1,17 +1,41 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Github, Linkedin, Mail, Facebook, Send, Copy, Loader2 } from "lucide-react";
+import { Github, Linkedin, Mail, Facebook, Send, Copy, Loader2, AlertCircle } from "lucide-react";
 import { Reveal, SectionHead } from "./Section";
 import { SOCIALS } from "../../data/portfolio";
+import { validateContact, isValid, LIMITS } from "../../lib/contactValidation";
 
 const API = (import.meta.env.VITE_BACKEND_URL || "") + "/api";
 const SOC_ICONS = { github: Github, linkedin: Linkedin, mail: Mail, facebook: Facebook };
 
+/** Abort a hanging request (e.g. backend cold-start) after this many ms. */
+const REQUEST_TIMEOUT_MS = 15000;
+
+function FieldError({ id, children }) {
+  if (!children) return null;
+  return (
+    <p id={id} role="alert" className="mt-1 flex items-center gap-1 font-mono2 text-[10px] sm:text-[11px] text-red-400">
+      <AlertCircle className="w-3 h-3 shrink-0" />
+      {children}
+    </p>
+  );
+}
+
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "", website: "" });
+  const [errors, setErrors] = useState({});
   const [sending, setSending] = useState(false);
+  const abortRef = useRef(null);
 
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  // Cancel any in-flight request if the component unmounts mid-send
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const set = (k) => (e) => {
+    const value = e.target.value;
+    setForm((f) => ({ ...f, [k]: value }));
+    // Clear the field's error as the user fixes it
+    setErrors((prev) => (prev[k] ? { ...prev, [k]: undefined } : prev));
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -20,22 +44,55 @@ export default function Contact() {
       // Silently fail to frustrate bots
       toast.success("Transmission received — I'll get back to you soon.");
       setForm({ name: "", email: "", message: "", website: "" });
-      setSending(false);
       return;
     }
+
+    const validation = validateContact(form);
+    setErrors(validation);
+    if (!isValid(validation)) {
+      toast.error("Please fix the highlighted fields.");
+      return;
+    }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
     setSending(true);
     try {
       const res = await fetch(`${API}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          message: form.message.trim(),
+          website: form.website,
+        }),
+        signal: controller.signal,
       });
-      if (!res.ok) throw new Error("non-2xx");
+      if (!res.ok) {
+        if (res.status === 429) {
+          toast.error("Slow down — too many messages. Try again in a minute.");
+        } else if (res.status === 422) {
+          toast.error("The server rejected that input — please check the fields.");
+        } else {
+          toast.error("Transmission failed — try emailing me directly instead.");
+        }
+        return;
+      }
       toast.success("Transmission received — I'll get back to you soon.");
       setForm({ name: "", email: "", message: "", website: "" });
-    } catch {
-      toast.error("Transmission failed — try emailing me directly instead.");
+      setErrors({});
+    } catch (err) {
+      if (err?.name === "AbortError") {
+        toast.error("Server is waking up (cold start) — please try again in a few seconds.");
+      } else {
+        toast.error("Transmission failed — try emailing me directly instead.");
+      }
     } finally {
+      clearTimeout(timeout);
       setSending(false);
     }
   };
@@ -48,6 +105,13 @@ export default function Contact() {
       toast.error("Couldn't copy — it's johndagooc2@gmail.com");
     }
   };
+
+  const inputCls = (hasError) =>
+    `w-full rounded-lg border bg-white/[0.04] px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600 outline-none transition-all ${
+      hasError
+        ? "border-red-400/60 focus:border-red-400 focus:shadow-[0_0_18px_rgba(248,113,113,0.15)]"
+        : "border-white/10 focus:border-cyan-400/60 focus:shadow-[0_0_18px_rgba(0,240,255,0.15)]"
+    }`;
 
   return (
     <section id="contact" className="relative py-20 sm:py-28 overflow-hidden" data-testid="contact-section">
@@ -62,7 +126,7 @@ export default function Contact() {
           sub="Have a project in mind? I just graduated and I'm ready — let's build something."
         />
 
-        <div className="lg:grid-cols-2 gap-8 lg:gap-14">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start">
           {/* Socials */}
           <Reveal>
             <div className="space-y-2.5 sm:space-y-3">
@@ -106,6 +170,7 @@ export default function Contact() {
           <Reveal delay={0.1}>
             <form
               onSubmit={submit}
+              noValidate
               className="glass border border-cyan-500/20 rounded-2xl p-5 sm:p-8 space-y-4 sm:space-y-5"
               data-testid="contact-form"
             >
@@ -122,11 +187,15 @@ export default function Contact() {
                   id="contact-name"
                   data-testid="contact-name-input"
                   required
+                  maxLength={LIMITS.name.max}
                   value={form.name}
                   onChange={set("name")}
                   placeholder="Your Name"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-cyan-400/60 focus:shadow-[0_0_18px_rgba(0,240,255,0.15)] transition-all"
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? "contact-name-error" : undefined}
+                  className={inputCls(errors.name)}
                 />
+                <FieldError id="contact-name-error">{errors.name}</FieldError>
               </div>
 
               <div>
@@ -138,11 +207,15 @@ export default function Contact() {
                   data-testid="contact-email-input"
                   type="email"
                   required
+                  maxLength={LIMITS.email.max}
                   value={form.email}
                   onChange={set("email")}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-cyan-400/60 focus:shadow-[0_0_18px_rgba(0,240,255,0.15)] transition-all"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "contact-email-error" : undefined}
+                  className={inputCls(errors.email)}
                 />
+                <FieldError id="contact-email-error">{errors.email}</FieldError>
               </div>
 
               <div>
@@ -154,15 +227,24 @@ export default function Contact() {
                   data-testid="contact-message-input"
                   required
                   rows={4}
+                  maxLength={LIMITS.message.max}
                   value={form.message}
                   onChange={set("message")}
                   placeholder="Tell me about your project..."
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-slate-200 placeholder:text-slate-600 outline-none focus:border-cyan-400/60 focus:shadow-[0_0_18px_rgba(0,240,255,0.15)] transition-all resize-none"
+                  aria-invalid={!!errors.message}
+                  aria-describedby={errors.message ? "contact-message-error" : undefined}
+                  className={`${inputCls(errors.message)} resize-none`}
                 />
+                <div className="flex items-start justify-between gap-2">
+                  <FieldError id="contact-message-error">{errors.message}</FieldError>
+                  <span className="ml-auto font-mono2 text-[9px] sm:text-[10px] text-slate-600 tabular-nums shrink-0">
+                    {form.message.length}/{LIMITS.message.max}
+                  </span>
+                </div>
               </div>
 
               {/* Honeypot field */}
-              <div className="absolute left-[-9999px]">
+              <div className="absolute left-[-9999px]" aria-hidden="true">
                 <label htmlFor="contact-website" className="sr-only">
                   Website
                 </label>

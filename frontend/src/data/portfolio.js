@@ -28,7 +28,7 @@ export const MARQUEE_ITEMS = [
 ];
 
 export const STATS = [
-  { value: 3, suffix: "", label: "Shipped Projects" },
+  { value: 4, suffix: "", label: "Shipped Projects" },
   { value: 2, suffix: "+", label: "Cisco Certs", gold: true },
   { value: 6, suffix: "+", label: "Tech Stacks" },
   { value: 2, suffix: "", label: "Languages Spoken", gold: true },
@@ -143,11 +143,23 @@ export const TIMELINE = [
       "Built and deployed BuildHub end to end — React/Vite/Capacitor frontend on Firebase Hosting, Express backend on Render.",
       "Built the BuKSU Motorpool fleet-management system for the university's PPMU, including an Android port via Capacitor.",
       "Built BookMe, a Laravel 13 multi-role booking marketplace with a unified Blade/Tailwind dashboard system.",
+      "Built and deployed a Laravel 11 Student Information System — dual-guard auth, interview scheduling, requirements review, and DomPDF-generated Certificates of Registration on Vercel + Supabase.",
     ],
   },
 ];
 
 export const PROJECTS = [
+  {
+    icon: "school",
+    title: "Student Information System",
+    badge: "Latest",
+    desc: "Laravel 11 SIS with dual-guard auth (admin + student on one login) — enrollment, grades, and subject management, an interview calendar, requirements review with file uploads, and auto-generated Certificate of Registration PDFs with tuition breakdown. Deployed serverless on Vercel + Supabase Postgres.",
+    tags: ["Laravel 11", "PHP 8.2", "MySQL", "Supabase", "DomPDF", "Vercel"],
+    links: [
+      { label: "Code", href: "https://github.com/caelum-sky/SIS_NEW" },
+      { label: "Live", href: "https://sis-new-seven.vercel.app" },
+    ],
+  },
   {
     icon: "helmet",
     title: "BuildHub",
@@ -270,7 +282,13 @@ export const AMA = [
     id: "projects",
     q: "What have you built?",
     keywords: ["project", "built", "build", "portfolio", "work"],
-    a: "Three production systems: BuildHub (construction & trades marketplace), BuKSU Motorpool (university fleet management with an Android port), and BookMe (Laravel multi-role booking marketplace). All shipped, all live.",
+    a: "Four production systems: a Student Information System (Laravel 11, dual-guard auth, COR PDF generation), BuildHub (construction & trades marketplace), BuKSU Motorpool (university fleet management with an Android port), and BookMe (Laravel multi-role booking marketplace). All shipped, all live.",
+  },
+  {
+    id: "sis",
+    q: "Tell me about the SIS",
+    keywords: ["sis", "student information", "school system", "enrollment", "grades", "cor"],
+    a: "A Laravel 11 Student Information System — admins manage students, subjects, grades, enrollments, interview schedules, and requirement approvals; students view grades, submit documents, and download a DomPDF-generated Certificate of Registration. Dual auth guards on one login page, deployed on Vercel + Supabase Postgres.",
   },
   {
     id: "certs",

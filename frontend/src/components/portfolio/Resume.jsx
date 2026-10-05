@@ -5,7 +5,7 @@ import { RESUME_URL } from "../../data/portfolio";
 
 const HIGHLIGHTS = [
   "BSIT Graduate, Bukidnon State University — Class of 2026, Dean's Lister",
-  "3 production systems shipped: BuildHub, BuKSU Motorpool, BookMe",
+  "4 production systems shipped: Student Information System, BuildHub, BuKSU Motorpool, BookMe",
   "2x Cisco CCNA certified · TOPCIT Level 2 · Wadhwani Job Ready",
   "Stack: Laravel, React, Node.js/Express, Firebase, Capacitor, PyTorch",
 ];

@@ -5,7 +5,7 @@ import { AMA, AMA_FALLBACK } from "../../data/portfolio";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-const findAnswer = (text) => {
+export const findAnswer = (text) => {
   const t = text.toLowerCase();
   const hit = AMA.find((item) => item.keywords.some((k) => t.includes(k)));
   return hit ? hit.a : AMA_FALLBACK;
@@ -45,6 +45,9 @@ export default function AskMeModal({ open, onClose }) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
+
+  // Always clear the typing interval on unmount so it never leaks
+  useEffect(() => () => clearInterval(timerRef.current), []);
 
   const ask = (question, answer) => {
     if (typing) return;
